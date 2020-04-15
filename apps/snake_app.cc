@@ -76,6 +76,8 @@ void SnakeApp::update() {
     if (top_players_.empty()) {
       leaderboard_.AddScoreToLeaderBoard({player_name_, engine_.GetScore()});
       top_players_ = leaderboard_.RetrieveHighScores(kLimit);
+      curr_player_scores_ = leaderboard_.RetrieveHighScores(
+          {player_name_, engine_.GetScore()}, kLimit);
 
       // It is crucial the this vector be populated, given that `kLimit` > 0.
       assert(!top_players_.empty());
@@ -183,6 +185,12 @@ void SnakeApp::DrawGameOver() {
     PrintText(ss.str(), color, size, {center.x, center.y + (++row) * 50});
   }
 
+  for (const snake::Player& player : curr_player_scores_) {
+    std::stringstream ss;
+    ss << player.name << " - " << player.score;
+    PrintText(ss.str(), color, size, {center.x, (++row) * 50});
+  }
+
   printed_game_over_ = true;
 }
 
@@ -275,6 +283,7 @@ void SnakeApp::ResetGame() {
   state_ = GameState::kPlaying;
   time_left_ = 0;
   top_players_.clear();
+  curr_player_scores_.clear();
 }
 
 }  // namespace snakeapp
