@@ -214,9 +214,27 @@ void SnakeApp::DrawSnake() const {
   const cinder::vec2 center = getWindowCenter();
 }
 
-void SnakeApp::DrawFood() const {
-  cinder::gl::color(0, 1, 0);
+void SnakeApp::DrawFood() {
+  auto now_time = std::chrono::system_clock::now();
+  double secs_until_color_change = ((1.0) / (engine_.GetSnake().Size()));
+  std::chrono::duration<double> diff = now_time - time_last_changed_color;
+  if (secs_until_color_change < diff.count()) {
+
+    if (g == 1) {
+      g = 0;
+      b = 1;
+    } else if (b == 1) {
+      b = 0;
+      r = 1;
+    } else if (r == 1) {
+      r = 0;
+      g = 1;
+    }
+    time_last_changed_color = std::chrono::system_clock::now();
+  }
+  cinder::gl::color(r, g, b);
   const Location loc = engine_.GetFood().GetLocation();
+  auto current_time = system_clock::now();
   cinder::gl::drawSolidRect(Rectf(tile_size_ * loc.Row(),
                                   tile_size_ * loc.Col(),
                                   tile_size_ * loc.Row() + tile_size_,
