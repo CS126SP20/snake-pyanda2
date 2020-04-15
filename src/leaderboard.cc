@@ -23,7 +23,9 @@ LeaderBoard::LeaderBoard(const string& db_path) : db_{db_path} {
 
 void LeaderBoard::AddScoreToLeaderBoard(const Player& player) {
   // TODO(you): Add your query here.
-  db_ << "";
+  db_ << "INSERT INTO leaderboard (name,score) VALUES (?,?);"
+      << player.name
+      << player.score;
 }
 
 vector<Player> GetPlayers(sqlite::database_binder* rows) {
@@ -42,15 +44,21 @@ vector<Player> GetPlayers(sqlite::database_binder* rows) {
 
 vector<Player> LeaderBoard::RetrieveHighScores(const size_t limit) {
   // TODO(you): Add your query here.
-  auto rows = db_ << "";
+  auto rows = db_ << "SELECT * FROM leaderboard "
+                     "ORDER BY score DESC LIMIT ?";
+  rows << limit;
   return GetPlayers(&rows);
 }
 
 vector<Player> LeaderBoard::RetrieveHighScores(const Player& player,
                                                const size_t limit) {
   // TODO(you): Add your query here.
-  auto rows = db_ << "";
+  auto rows = db_ << "SELECT * FROM leaderboard WHERE name LIKE ?"
+                     "ORDER BY score DESC LIMIT ?";
+  rows << player.name;
+  rows << limit;
   return GetPlayers(&rows);
 }
+
 
 }  // namespace snake
