@@ -6,6 +6,8 @@
 #include <cinder/app/App.h>
 #include <cinder/audio/audio.h>
 #include <cinder/gl/gl.h>
+#include <cinder/ImageIo.h>
+#include <cinder/gl/Texture.h>
 #include <snake/engine.h>
 #include <snake/leaderboard.h>
 #include <snake/player.h>
@@ -66,8 +68,12 @@ class SnakeApp : public cinder::app::App {
   //time since food last changed color
   std::chrono::time_point<std::chrono::system_clock> time_last_changed_color
   = std::chrono::system_clock::now();
+  //Sound objects
   cinder::audio::VoiceRef background_sound;
   cinder::audio::VoiceRef nom_sound;
+  //New background image
+  cinder::gl::TextureRef background_image;
+
 };
 
 }  // namespace snakeapp

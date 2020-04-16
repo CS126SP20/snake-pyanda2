@@ -58,7 +58,9 @@ DECLARE_uint32(speed);
 DECLARE_string(name);
 
 SnakeApp::SnakeApp()
-    : engine_{FLAGS_size, FLAGS_size},
+    : background_image(cinder::gl::Texture::create(loadImage(
+        loadAsset("space.jpg")))),
+      engine_{FLAGS_size, FLAGS_size},
       leaderboard_{cinder::app::getAssetPath(kDbPath).string()},
       paused_{false},
       player_name_{FLAGS_name},
@@ -73,6 +75,7 @@ void SnakeApp::setup() {
   cinder::gl::enableDepthWrite();
   cinder::gl::enableDepthRead();
   BackgroundSound();
+
 }
 
 void SnakeApp::update() {
@@ -169,6 +172,9 @@ float SnakeApp::PercentageOver() const {
 
 void SnakeApp::DrawBackground() const {
   const float percentage = PercentageOver();
+//  if (percentage == 0.0f) {
+//    cinder::gl::draw(background_image, getWindowBounds());
+//  }
   cinder::gl::clear(Color(percentage, 0, 0));
 }
 
