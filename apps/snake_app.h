@@ -4,6 +4,7 @@
 #define SNAKE_SNAKEAPP_H_
 
 #include <cinder/app/App.h>
+#include <cinder/audio/audio.h>
 #include <cinder/gl/gl.h>
 #include <snake/engine.h>
 #include <snake/leaderboard.h>
@@ -37,6 +38,8 @@ class SnakeApp : public cinder::app::App {
   void DrawSnake() const;
   float PercentageOver() const;
   void ResetGame();
+  void BackgroundSound();
+  void SnakeEatingSound();
 
  private:
   snake::Engine engine_;
@@ -53,12 +56,18 @@ class SnakeApp : public cinder::app::App {
   const size_t tile_size_;
   size_t time_left_;
   std::vector<snake::Player> top_players_;
+  //current player's top scores
   std::vector<snake::Player> curr_player_scores_;
+  //rgb values for snake's food (constantly changing)
   int r = 0;
   int g = 1;
   int b = 0;
+  int snake_size = engine_.GetSnake().Size();
+  //time since food last changed color
   std::chrono::time_point<std::chrono::system_clock> time_last_changed_color
   = std::chrono::system_clock::now();
+  cinder::audio::VoiceRef background_sound;
+  cinder::audio::VoiceRef nom_sound;
 };
 
 }  // namespace snakeapp

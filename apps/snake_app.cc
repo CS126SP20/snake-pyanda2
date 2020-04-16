@@ -5,9 +5,12 @@
 #include <cinder/Font.h>
 #include <cinder/Text.h>
 #include <cinder/Vector.h>
+#include <cinder/audio/Voice.h>
+#include <cinder/audio/audio.h>
 #include <cinder/gl/draw.h>
 #include <cinder/gl/gl.h>
 #include <gflags/gflags.h>
+#include <rpc.h>
 #include <snake/player.h>
 #include <snake/segment.h>
 
@@ -69,6 +72,7 @@ SnakeApp::SnakeApp()
 void SnakeApp::setup() {
   cinder::gl::enableDepthWrite();
   cinder::gl::enableDepthRead();
+  BackgroundSound();
 }
 
 void SnakeApp::update() {
@@ -192,6 +196,7 @@ void SnakeApp::DrawGameOver() {
   }
 
   printed_game_over_ = true;
+  background_sound->stop();
 }
 
 void SnakeApp::DrawSnake() const {
@@ -218,8 +223,8 @@ void SnakeApp::DrawFood() {
   auto now_time = std::chrono::system_clock::now();
   double secs_until_color_change = ((1.0) / (engine_.GetSnake().Size()));
   std::chrono::duration<double> diff = now_time - time_last_changed_color;
-  if (secs_until_color_change < diff.count()) {
 
+  if (secs_until_color_change < diff.count()) {
     if (g == 1) {
       g = 0;
       b = 1;
@@ -232,6 +237,7 @@ void SnakeApp::DrawFood() {
     }
     time_last_changed_color = std::chrono::system_clock::now();
   }
+
   cinder::gl::color(r, g, b);
   const Location loc = engine_.GetFood().GetLocation();
   auto current_time = system_clock::now();
@@ -239,6 +245,10 @@ void SnakeApp::DrawFood() {
                                   tile_size_ * loc.Col(),
                                   tile_size_ * loc.Row() + tile_size_,
                                   tile_size_ * loc.Col() + tile_size_));
+  if (engine_.GetSnake().Size() > snake_size) {
+    SnakeEatingSound();
+    snake_size = engine_.GetSnake().Size();
+  }
 }
 
 void SnakeApp::DrawCountDown() const {
@@ -302,6 +312,29 @@ void SnakeApp::ResetGame() {
   time_left_ = 0;
   top_players_.clear();
   curr_player_scores_.clear();
+}
+
+//https://libcinder.org/docs/guides/audio/index.html --online code
+void SnakeApp::BackgroundSound() {
+  using namespace cinder;
+
+  audio::SourceFileRef sourceFile = audio::load( app::loadAsset(
+      "Cinematic-electronic-track.mp3" ) );
+  background_sound = audio::Voice::create( sourceFile );
+
+  // Start playing audio from the voice:
+  background_sound->start();
+}
+
+void SnakeApp::SnakeEatingSound() {
+  using namespace cinder;
+
+  audio::SourceFileRef sourceFile = audio::load( app::loadAsset(
+      "nom-nom-nom.mp3" ) );
+  nom_sound = audio::Voice::create( sourceFile );
+
+  // Start playing audio from the voice:
+  nom_sound->start();
 }
 
 }  // namespace snakeapp
